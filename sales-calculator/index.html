@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="销售计算器">
     <meta name="theme-color" content="#1a73e8">
-    <title>销售价格计算器</title>
+    <title>销售价格计算器（含税）</title>
     <style>
         /* ============ CSS 变量 ============ */
         :root {
@@ -345,12 +345,12 @@
 
         .result-details {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
-            gap: 20px;
+            gap: 10px;
             margin-top: 16px;
             position: relative;
             z-index: 1;
-            flex-wrap: wrap;
         }
 
         .detail-item {
@@ -358,8 +358,9 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             border-radius: var(--radius-xs);
-            padding: 10px 16px;
-            min-width: 100px;
+            padding: 10px 14px;
+            min-width: 80px;
+            flex: 1 1 auto;
             transition: var(--transition);
         }
 
@@ -369,12 +370,14 @@
             opacity: 0.8;
             letter-spacing: 1px;
             text-transform: uppercase;
+            white-space: nowrap;
         }
 
         .detail-item .detail-value {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 700;
             margin-top: 2px;
+            word-break: break-all;
         }
 
         /* ============ 操作按钮 ============ */
@@ -427,44 +430,6 @@
 
         .btn-reset:hover {
             background: rgba(255, 255, 255, 0.2);
-        }
-
-        /* ============ 计算方式切换 ============ */
-        .mode-toggle {
-            display: flex;
-            background: #f1f3f4;
-            border-radius: var(--radius-sm);
-            padding: 3px;
-            gap: 3px;
-            margin-bottom: 14px;
-        }
-
-        .mode-btn {
-            flex: 1;
-            padding: 10px 8px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            font-family: var(--font-family);
-            border: none;
-            border-radius: var(--radius-xs);
-            background: transparent;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: var(--transition);
-            touch-action: manipulation;
-            -webkit-user-select: none;
-            user-select: none;
-            letter-spacing: 0.5px;
-        }
-
-        .mode-btn.active {
-            background: #ffffff;
-            color: var(--primary);
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .mode-btn:active {
-            transform: scale(0.96);
         }
 
         /* ============ 历史记录 ============ */
@@ -625,8 +590,8 @@
                 padding: 16px 14px;
             }
             .detail-item {
-                min-width: 80px;
-                padding: 8px 12px;
+                min-width: 70px;
+                padding: 8px 10px;
             }
         }
 
@@ -667,15 +632,6 @@
                 border-color: var(--primary);
             }
 
-            .mode-toggle {
-                background: #1a1a2e;
-            }
-
-            .mode-btn.active {
-                background: #303048;
-                color: #4a9eff;
-            }
-
             .history-item:hover {
                 background: #1e1e32;
             }
@@ -708,7 +664,7 @@
         <header class="app-header">
             <span class="icon">🧮</span>
             <h1>销售价格计算器</h1>
-            <p class="subtitle">输入采购价 · 设置加层比率 · 秒出销售价</p>
+            <p class="subtitle">含税计算 · 进项税 · 销项税 · 附加税 · 毛利</p>
         </header>
 
         <!-- 输入区域 -->
@@ -717,10 +673,10 @@
 
             <!-- 采购价 -->
             <div class="input-group">
-                <label class="input-label" for="costInput">采购价 <span class="unit">(成本价)</span></label>
+                <label class="input-label" for="costInput">采购价（含税） <span class="unit">(¥)</span></label>
                 <div class="input-wrapper">
                     <span class="input-prefix">¥</span>
-                    <input type="number" id="costInput" inputmode="decimal" placeholder="请输入采购价"
+                    <input type="number" id="costInput" inputmode="decimal" placeholder="请输入含税采购价"
                     autocomplete="off" step="any" min="0">
                 </div>
             </div>
@@ -735,41 +691,52 @@
                 </div>
                 <!-- 快捷比率按钮 -->
                 <div class="quick-buttons">
+                    <button class="quick-btn" data-rate="1">1%</button>
+                    <button class="quick-btn" data-rate="2">2%</button>
+                    <button class="quick-btn" data-rate="3">3%</button>
                     <button class="quick-btn" data-rate="5">5%</button>
+                    <button class="quick-btn" data-rate="8">8%</button>
                     <button class="quick-btn" data-rate="10">10%</button>
                     <button class="quick-btn" data-rate="15">15%</button>
                     <button class="quick-btn" data-rate="20">20%</button>
                     <button class="quick-btn" data-rate="25">25%</button>
                     <button class="quick-btn" data-rate="30">30%</button>
-                    <button class="quick-btn" data-rate="40">40%</button>
-                    <button class="quick-btn" data-rate="50">50%</button>
-                    <button class="quick-btn" data-rate="100">100%</button>
-                    <button class="quick-btn" data-rate="200">200%</button>
                 </div>
             </div>
         </div>
 
         <!-- 计算结果 -->
         <div class="result-card" id="resultCard">
-            <!-- 计算方式切换 -->
-            <div class="mode-toggle">
-                <button class="mode-btn active" data-mode="markup" id="modeMarkup">加价法</button>
-                <button class="mode-btn" data-mode="margin" id="modeMargin">毛利率法</button>
-            </div>
-
-            <div class="result-label">📊 销售价格</div>
+            <div class="result-label">📊 销售价格（含税）</div>
             <div class="result-price" id="resultPrice" title="点击复制结果">
                 <span class="currency">¥</span><span id="resultValue">0.00</span>
             </div>
 
-            <div class="result-details">
+            <div class="result-details" id="resultDetails">
+                <!-- 动态展示进项税、销项税、附加税、印花税、毛利润、毛利率 -->
                 <div class="detail-item">
-                    <div class="detail-label">利润</div>
-                    <div class="detail-value" id="profitValue">¥0.00</div>
+                    <div class="detail-label">进项税</div>
+                    <div class="detail-value" id="inputTax">¥0.00</div>
                 </div>
                 <div class="detail-item">
-                    <div class="detail-label">利润率</div>
-                    <div class="detail-value" id="profitRateValue">0.00%</div>
+                    <div class="detail-label">销项税</div>
+                    <div class="detail-value" id="outputTax">¥0.00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">附加税</div>
+                    <div class="detail-value" id="surcharge">¥0.00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">印花税</div>
+                    <div class="detail-value" id="stampDuty">¥0.00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">毛利润</div>
+                    <div class="detail-value" id="grossProfit">¥0.00</div>
+                </div>
+                <div class="detail-item">
+                    <div class="detail-label">毛利率</div>
+                    <div class="detail-value" id="grossMargin">0.0000%</div>
                 </div>
             </div>
 
@@ -806,8 +773,12 @@
             const costInput = document.getElementById('costInput');
             const rateInput = document.getElementById('rateInput');
             const resultValue = document.getElementById('resultValue');
-            const profitValue = document.getElementById('profitValue');
-            const profitRateValue = document.getElementById('profitRateValue');
+            const inputTaxEl = document.getElementById('inputTax');
+            const outputTaxEl = document.getElementById('outputTax');
+            const surchargeEl = document.getElementById('surcharge');
+            const stampDutyEl = document.getElementById('stampDuty');
+            const grossProfitEl = document.getElementById('grossProfit');
+            const grossMarginEl = document.getElementById('grossMargin');
             const resultPrice = document.getElementById('resultPrice');
             const copyBtn = document.getElementById('copyBtn');
             const resetBtn = document.getElementById('resetBtn');
@@ -816,25 +787,21 @@
             const clearHistoryBtn = document.getElementById('clearHistoryBtn');
             const toast = document.getElementById('toast');
             const quickBtns = document.querySelectorAll('.quick-btn');
-            const modeMarkup = document.getElementById('modeMarkup');
-            const modeMargin = document.getElementById('modeMargin');
 
             // ============ 状态 ============
-            let currentMode = 'markup'; // 'markup' = 加价法, 'margin' = 毛利率法
             let lastResult = null;
             let toastTimeout = null;
 
             // ============ 常量 ============
-            const HISTORY_KEY = 'sales_calculator_history';
+            const HISTORY_KEY = 'sales_calculator_history_v2';
             const MAX_HISTORY = 50;
-            const STORAGE_COST_KEY = 'sales_calculator_cost';
-            const STORAGE_RATE_KEY = 'sales_calculator_rate';
-            const STORAGE_MODE_KEY = 'sales_calculator_mode';
+            const STORAGE_COST_KEY = 'sales_calculator_cost_v2';
+            const STORAGE_RATE_KEY = 'sales_calculator_rate_v2';
 
             // ============ 工具函数 ============
-            function formatNumber(num) {
+            function formatNumber(num, digits = 2) {
                 if (isNaN(num) || !isFinite(num)) return '0.00';
-                return num.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                return num.toFixed(digits).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
             }
 
             function formatPrice(num) {
@@ -862,7 +829,6 @@
             }
 
             function copyToClipboard(text) {
-                // 优先使用 navigator.clipboard API
                 if (navigator.clipboard && navigator.clipboard.writeText) {
                     return navigator.clipboard.writeText(text).then(() => true).catch(() => fallbackCopy(text));
                 }
@@ -870,7 +836,6 @@
             }
 
             function fallbackCopy(text) {
-                // 降级方案：使用临时 textarea
                 const textarea = document.createElement('textarea');
                 textarea.value = text;
                 textarea.style.position = 'fixed';
@@ -897,50 +862,58 @@
 
                 if (isNaN(cost) || cost < 0 || isNaN(rate) || rate < 0) {
                     resultValue.textContent = '0.00';
-                    profitValue.textContent = '¥0.00';
-                    profitRateValue.textContent = '0.00%';
+                    inputTaxEl.textContent = '¥0.00';
+                    outputTaxEl.textContent = '¥0.00';
+                    surchargeEl.textContent = '¥0.00';
+                    stampDutyEl.textContent = '¥0.00';
+                    grossProfitEl.textContent = '¥0.00';
+                    grossMarginEl.textContent = '0.0000%';
                     lastResult = null;
                     return;
                 }
 
-                let salePrice, profit, profitRate;
+                // 销售价 = 采购价 * (1 + 加层比率/100)
+                const salePrice = cost * (1 + rate / 100);
+                // 进项税 = 采购价 - 采购价 / 1.13
+                const inputTax = cost - cost / 1.13;
+                // 销项税 = 销售价 - 销售价 / 1.13
+                const outputTax = salePrice - salePrice / 1.13;
+                // 附加税 = (销项税 - 进项税) * 12%
+                const surcharge = (outputTax - inputTax) * 0.12;
+                // 印花税 = 销售价 * 0.03%
+                const stampDuty = salePrice * 0.0003;
+                // 毛利润 = (销售价/1.13 - 采购价/1.13) - 附加税 - 印花税
+                const grossProfit = (salePrice / 1.13 - cost / 1.13) - surcharge - stampDuty;
+                // 毛利率 = 毛利润 / 销售价 * 100%
+                const grossMargin = (grossProfit / salePrice) * 100;
 
-                if (currentMode === 'markup') {
-                    // 加价法：销售价 = 采购价 × (1 + 加层比率/100)
-                    salePrice = cost * (1 + rate / 100);
-                    profit = salePrice - cost;
-                    profitRate = (profit / salePrice) * 100;
-                } else {
-                    // 毛利率法：销售价 = 采购价 ÷ (1 - 毛利率/100)
-                    if (rate >= 100) {
-                        // 毛利率不能超过100%
-                        resultValue.textContent = '⚠️ 无效';
-                        profitValue.textContent = '--';
-                        profitRateValue.textContent = '--';
-                        lastResult = null;
-                        return;
-                    }
-                    salePrice = cost / (1 - rate / 100);
-                    profit = salePrice - cost;
-                    profitRate = rate; // 毛利率就是输入的比率
-                }
+                // 保留精度
+                const roundedSalePrice = Math.round(salePrice * 100) / 100;
+                const roundedInputTax = Math.round(inputTax * 100) / 100;
+                const roundedOutputTax = Math.round(outputTax * 100) / 100;
+                const roundedSurcharge = Math.round(surcharge * 100) / 100;
+                const roundedStampDuty = Math.round(stampDuty * 100) / 100;
+                const roundedGrossProfit = Math.round(grossProfit * 100) / 100;
+                const roundedGrossMargin = Math.round(grossMargin * 10000) / 10000; // 保留四位小数
 
-                // 处理精度
-                salePrice = Math.round(salePrice * 100) / 100;
-                profit = Math.round(profit * 100) / 100;
-                profitRate = Math.round(profitRate * 100) / 100;
-
-                resultValue.textContent = formatNumber(salePrice);
-                profitValue.textContent = formatPrice(profit);
-                profitRateValue.textContent = formatNumber(profitRate) + '%';
+                resultValue.textContent = formatNumber(roundedSalePrice);
+                inputTaxEl.textContent = formatPrice(roundedInputTax);
+                outputTaxEl.textContent = formatPrice(roundedOutputTax);
+                surchargeEl.textContent = formatPrice(roundedSurcharge);
+                stampDutyEl.textContent = formatPrice(roundedStampDuty);
+                grossProfitEl.textContent = formatPrice(roundedGrossProfit);
+                grossMarginEl.textContent = formatNumber(roundedGrossMargin, 4) + '%';
 
                 lastResult = {
                     cost: cost,
                     rate: rate,
-                    salePrice: salePrice,
-                    profit: profit,
-                    profitRate: profitRate,
-                    mode: currentMode,
+                    salePrice: roundedSalePrice,
+                    inputTax: roundedInputTax,
+                    outputTax: roundedOutputTax,
+                    surcharge: roundedSurcharge,
+                    stampDuty: roundedStampDuty,
+                    grossProfit: roundedGrossProfit,
+                    grossMargin: roundedGrossMargin,
                     time: getTimestamp()
                 };
 
@@ -985,13 +958,11 @@
                 }
                 historyEmpty.style.display = 'none';
                 historyList.innerHTML = history.map((item, index) => {
-                    const modeLabel = item.mode === 'markup' ? '加价' : '毛利率';
-                    const rateDisplay = item.mode === 'markup' ? `+${item.rate}%` : `毛利率${item.rate}%`;
                     return `
                         <li class="history-item" data-index="${index}" data-sale-price="${item.salePrice}">
                             <div class="h-info">
                                 <div class="h-main">采购 ¥${formatNumber(item.cost)} → 销售 ¥${formatNumber(item.salePrice)}</div>
-                                <div class="h-sub">${item.time} · ${modeLabel} ${rateDisplay} · 利润 ¥${formatNumber(item.profit)}</div>
+                                <div class="h-sub">${item.time} · 加层 ${item.rate}% · 毛利 ¥${formatNumber(item.grossProfit)}</div>
                             </div>
                             <div class="h-price">¥${formatNumber(item.salePrice)}</div>
                         </li>
@@ -1021,7 +992,6 @@
                 try {
                     localStorage.setItem(STORAGE_COST_KEY, costInput.value);
                     localStorage.setItem(STORAGE_RATE_KEY, rateInput.value);
-                    localStorage.setItem(STORAGE_MODE_KEY, currentMode);
                 } catch (e) {
                     // 忽略
                 }
@@ -1031,41 +1001,10 @@
                 try {
                     const savedCost = localStorage.getItem(STORAGE_COST_KEY);
                     const savedRate = localStorage.getItem(STORAGE_RATE_KEY);
-                    const savedMode = localStorage.getItem(STORAGE_MODE_KEY);
                     if (savedCost) costInput.value = savedCost;
                     if (savedRate) rateInput.value = savedRate;
-                    if (savedMode && (savedMode === 'markup' || savedMode === 'margin')) {
-                        currentMode = savedMode;
-                        updateModeUI();
-                    }
                 } catch (e) {
                     // 忽略
-                }
-            }
-
-            // ============ 模式切换 ============
-            function updateModeUI() {
-                if (currentMode === 'markup') {
-                    modeMarkup.classList.add('active');
-                    modeMargin.classList.remove('active');
-                    rateInput.placeholder = '请输入加层比率';
-                } else {
-                    modeMargin.classList.add('active');
-                    modeMarkup.classList.remove('active');
-                    rateInput.placeholder = '请输入目标毛利率';
-                }
-            }
-
-            function setMode(mode) {
-                if (mode === currentMode) return;
-                currentMode = mode;
-                updateModeUI();
-                calculate();
-                saveInputs();
-                if (mode === 'markup') {
-                    showToast('🔄 已切换：加价法\n销售价 = 采购价 × (1 + 比率)');
-                } else {
-                    showToast('🔄 已切换：毛利率法\n销售价 = 采购价 ÷ (1 - 毛利率)');
                 }
             }
 
@@ -1074,8 +1013,12 @@
                 costInput.value = '';
                 rateInput.value = '';
                 resultValue.textContent = '0.00';
-                profitValue.textContent = '¥0.00';
-                profitRateValue.textContent = '0.00%';
+                inputTaxEl.textContent = '¥0.00';
+                outputTaxEl.textContent = '¥0.00';
+                surchargeEl.textContent = '¥0.00';
+                stampDutyEl.textContent = '¥0.00';
+                grossProfitEl.textContent = '¥0.00';
+                grossMarginEl.textContent = '0.0000%';
                 lastResult = null;
                 saveInputs();
                 costInput.focus();
@@ -1149,13 +1092,6 @@
                 }
             });
 
-            modeMarkup.addEventListener('click', function() {
-                setMode('markup');
-            });
-            modeMargin.addEventListener('click', function() {
-                setMode('margin');
-            });
-
             costInput.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter') {
                     if (lastResult && lastResult.salePrice > 0) {
@@ -1188,7 +1124,6 @@
             // ============ 初始化 ============
             function init() {
                 restoreInputs();
-                updateModeUI();
                 renderHistory();
                 calculate();
                 setTimeout(() => {
